@@ -3,10 +3,11 @@ import random
 import os
 import datetime
 import pickle
+import json
 
 
-def get_all_books():
-    url = 'https://gutendex.com/books'
+def get_all_books(start_url):
+    url = start_url
     current_list = requests.get(url)
     long_list = []
     count = 10  # keep this from running forever or attracting too much scrutiny
@@ -19,9 +20,14 @@ def get_all_books():
 
 
 if __name__ == '__main__':
+    with open("config.json") as chandle:
+        config = json.load(chandle)
+        cache_fname = config["cache"]
+        book_format = config["book_format"]
+        books_url = 'https://gutendex.com/books'
     mtime_datetime = None
     try:
-        mtime = os.path.getmtime('books.pkl')
+        mtime = os.path.getmtime(cache_fname)
         mtime_datetime = datetime.datetime.fromtimestamp(mtime)
     except OSError:
         mtime = None
@@ -30,12 +36,12 @@ if __name__ == '__main__':
 
     if not mtime or (mtime_datetime - now).seconds > 24*60*60:
         # print("pickle file does not exist or is too stale")
-        book_list = get_all_books()
-        with open("books.pkl", "wb") as fhandle:
+        book_list = get_all_books(books_url)
+        with open(cache_fname, "wb") as fhandle:
             pickle.dump(book_list, fhandle)
     else:
         # print("shortcut: reading from relevant pickle file")
-        with open('books.pkl', "rb") as fhandle:
+        with open(cache_fname, "rb") as fhandle:
             book_list = pickle.load(fhandle)
     if not book_list:
         raise OSError
@@ -43,7 +49,7 @@ if __name__ == '__main__':
     while not written:
         book = book_list[random.randint(0, len(book_list)-1)]
         sentence_list = requests.get(
-            book['formats']['text/plain; charset=us-ascii']
+            book['formats'][book_format]
         ).text.split('.')
         print(book['title'], sentence_list[random.randint(0, len(sentence_list)-1)])
         written = True
