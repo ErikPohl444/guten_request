@@ -4,7 +4,7 @@ Read in the text of Frankenstein and select a random sentence for output.
 
 ## Future plans
 
-- [ ] 
+- [ ] Build this into a selector from Public Domain books, retrieving a quote per execution with the book title.
 
 ## Important disclaimer
 
