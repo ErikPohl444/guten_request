@@ -1,4 +1,5 @@
 {
   "cache": "books.pkl",
-  "book_format": "text/plain; charset=us-ascii"
+  "book_format": "text/plain; charset=us-ascii",
+  "books_url": "https://gutendex.com/books"
 }

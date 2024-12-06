@@ -24,7 +24,7 @@ if __name__ == '__main__':
         config = json.load(chandle)
         cache_fname = config["cache"]
         book_format = config["book_format"]
-        books_url = 'https://gutendex.com/books'
+        books_url = config["books_url"]
     mtime_datetime = None
     try:
         mtime = os.path.getmtime(cache_fname)
