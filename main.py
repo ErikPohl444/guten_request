@@ -38,23 +38,24 @@ def write_title_and_sentence(book_list):
         sentence_list = requests.get(
             book['formats'][book_format]
         ).text.split('.')
-        print(book['title'], sentence_list[random.randint(0, len(sentence_list)-1)])
+        print(book['title'],
+              sentence_list[random.randint(0, len(sentence_list)-1)]+'.')
         written = True
 
 
 if __name__ == '__main__':
-    with open("config.json") as chandle:
-        config = json.load(chandle)
-        cache_fname = config["cache"]
+    with open("config.json") as config_handle:
+        config = json.load(config_handle)
+        cache_file_name = config["cache"]
         book_format = config["book_format"]
         books_url = config["books_url"]
         books_stale_after_secs = int(config["books_stale_after_secs"])
         books_list_max_page_count = int(config["books_list_max_page_count"])
 
-    if is_stale_cache(cache_fname):
-        book_list = get_all_books(books_url, cache_fname, books_list_max_page_count)
+    if is_stale_cache(cache_file_name):
+        book_list = get_all_books(books_url, cache_file_name, books_list_max_page_count)
     else:
-        with open(cache_fname, "rb") as fhandle:
+        with open(cache_file_name, "rb") as fhandle:
             book_list = pickle.load(fhandle)
     if not book_list:
         raise OSError
