@@ -32,7 +32,7 @@ def is_stale_cache(cache_file_name):
     )
 
 
-def write_title_and_sentence(book_list):
+def output_title_and_random_sentence(book_list):
     written = False
     while not written:
         book = book_list[random.randint(0, len(book_list)-1)]
@@ -64,4 +64,4 @@ if __name__ == '__main__':
     if not book_list:
         raise OSError
 
-    write_title_and_sentence(book_list)
+    output_title_and_random_sentence(book_list)
