@@ -25,6 +25,9 @@ if __name__ == '__main__':
         cache_fname = config["cache"]
         book_format = config["book_format"]
         books_url = config["books_url"]
+        books_stale_after_secs = int(config["books_stale_after_secs"])
+
+
     mtime_datetime = None
     try:
         mtime = os.path.getmtime(cache_fname)
@@ -34,13 +37,11 @@ if __name__ == '__main__':
 
     now = datetime.datetime.now()
 
-    if not mtime or (mtime_datetime - now).seconds > 24*60*60:
-        # print("pickle file does not exist or is too stale")
+    if not mtime or (mtime_datetime - now).seconds > books_stale_after_secs :
         book_list = get_all_books(books_url)
         with open(cache_fname, "wb") as fhandle:
             pickle.dump(book_list, fhandle)
     else:
-        # print("shortcut: reading from relevant pickle file")
         with open(cache_fname, "rb") as fhandle:
             book_list = pickle.load(fhandle)
     if not book_list:
