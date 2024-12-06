@@ -6,12 +6,12 @@ import pickle
 import json
 
 
-def get_all_books(start_url, cache_fname):
+def get_all_books(start_url, cache_fname, max_count):
     url = start_url
     current_list = requests.get(url)
     long_list = []
-    count = 10  # keep this from running forever or attracting too much scrutiny
-    while current_list.status_code == 200 and count > 0:
+    count = max_count  # keep this from running forever or attracting too much scrutiny
+    while current_list.ok and count > 0:
         long_list.extend(current_list.json()["results"])
         url = current_list.json()["next"]
         current_list = requests.get(url)
@@ -31,21 +31,7 @@ def is_stale_cache(cache_fname):
     return not mtime or (mtime_datetime - datetime.datetime.now()).seconds > books_stale_after_secs
 
 
-if __name__ == '__main__':
-    with open("config.json") as chandle:
-        config = json.load(chandle)
-        cache_fname = config["cache"]
-        book_format = config["book_format"]
-        books_url = config["books_url"]
-        books_stale_after_secs = int(config["books_stale_after_secs"])
-
-    if is_stale_cache(cache_fname):
-        book_list = get_all_books(books_url, cache_fname)
-    else:
-        with open(cache_fname, "rb") as fhandle:
-            book_list = pickle.load(fhandle)
-    if not book_list:
-        raise OSError
+def write_title_and_sentence(book_list):
     written = False
     while not written:
         book = book_list[random.randint(0, len(book_list)-1)]
@@ -54,3 +40,23 @@ if __name__ == '__main__':
         ).text.split('.')
         print(book['title'], sentence_list[random.randint(0, len(sentence_list)-1)])
         written = True
+
+
+if __name__ == '__main__':
+    with open("config.json") as chandle:
+        config = json.load(chandle)
+        cache_fname = config["cache"]
+        book_format = config["book_format"]
+        books_url = config["books_url"]
+        books_stale_after_secs = int(config["books_stale_after_secs"])
+        books_list_max_page_count = int(config["books_list_max_page_count"])
+
+    if is_stale_cache(cache_fname):
+        book_list = get_all_books(books_url, cache_fname, books_list_max_page_count)
+    else:
+        with open(cache_fname, "rb") as fhandle:
+            book_list = pickle.load(fhandle)
+    if not book_list:
+        raise OSError
+
+    write_title_and_sentence(book_list)
