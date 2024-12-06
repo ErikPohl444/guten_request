@@ -6,6 +6,7 @@ Now: Read in a set of the top downloaded public-domain books on Project Gutenber
 
 - [X] Build this into a selector from Public Domain books, retrieving a quote per execution with the book title.
 - [X] Use a pickle file to read from cache daily and update cache when it becomes stale
+- [X] Derive configuration values from a cong.json file
 ## Important disclaimer
 
 If any
