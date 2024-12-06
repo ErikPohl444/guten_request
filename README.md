@@ -1,7 +1,7 @@
 # guten_request
 
-Read in the text of Frankenstein and select a random sentence for output.
-
+Initially: Read in the text of Frankenstein and select a random sentence for output.
+Now: Read in a set of the top downloaded public-domain books on Project Gutenberg and select a random sentence from a random book
 ## Future plans
 
 - [ ] Build this into a selector from Public Domain books, retrieving a quote per execution with the book title.
