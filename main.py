@@ -21,12 +21,15 @@ def get_all_books(start_url, cache_file_name, max_count):
     return all_books
 
 
-def is_stale_cache(cache_fname):
+def is_stale_cache(cache_file_name):
     try:
-        cache_last_written = datetime.datetime.fromtimestamp(os.path.getmtime(cache_fname))
+        cache_last_written = datetime.datetime.fromtimestamp(os.path.getmtime(cache_file_name))
     except OSError:
         cache_last_written = None
-    return not cache_last_written or (cache_last_written - datetime.datetime.now()).seconds > books_stale_after_secs
+    return (
+            not cache_last_written
+            or (cache_last_written - datetime.datetime.now()).seconds > books_stale_after_secs
+    )
 
 
 def write_title_and_sentence(book_list):
@@ -40,7 +43,7 @@ def write_title_and_sentence(book_list):
             print(book['title'],
                   sentence_list[random.randint(0, len(sentence_list)-1)]+'.')
             written = True
-        except ValueError:
+        except KeyError:
             written = False
 
 
