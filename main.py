@@ -13,12 +13,11 @@ def get_sentence(contents, marker):
 
 
 if __name__ == '__main__':
-    books = requests.get('https://www.gutenberg.org/cache/epub/42324/pg42324.txt')
+    frankenstein_gutenberg_text = requests.get('https://www.gutenberg.org/cache/epub/42324/pg42324.txt')
     index = 0
-    count = random.randint(0, 3286)
+    count = random.randint(0, frankenstein_gutenberg_text.text.count('.') - 1)
     sentence = ''
     while count >= 0:
-        print(count)
-        sentence, index = get_sentence(books.text, index)
+        sentence, index = get_sentence(frankenstein_gutenberg_text.text, index)
         count -= 1
     print(sentence)
