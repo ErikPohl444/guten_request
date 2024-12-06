@@ -6,41 +6,42 @@ import pickle
 import json
 
 
-def get_all_books(start_url, cache_fname, max_count):
+def get_all_books(start_url, cache_file_name, max_count):
     url = start_url
     current_list = requests.get(url)
-    long_list = []
+    all_books = []
     count = max_count  # keep this from running forever or attracting too much scrutiny
     while current_list.ok and count > 0:
-        long_list.extend(current_list.json()["results"])
+        all_books.extend(current_list.json()["results"])
         url = current_list.json()["next"]
         current_list = requests.get(url)
         count -= 1
-    with open(cache_fname, "wb") as fhandle:
-        pickle.dump(book_list, fhandle)
-    return long_list
+    with open(cache_file_name, "wb") as file_handle:
+        pickle.dump(book_list, file_handle)
+    return all_books
 
 
 def is_stale_cache(cache_fname):
-    mtime_datetime = None
     try:
-        mtime = os.path.getmtime(cache_fname)
-        mtime_datetime = datetime.datetime.fromtimestamp(mtime)
+        cache_last_written = datetime.datetime.fromtimestamp(os.path.getmtime(cache_fname))
     except OSError:
-        mtime = None
-    return not mtime or (mtime_datetime - datetime.datetime.now()).seconds > books_stale_after_secs
+        cache_last_written = None
+    return not cache_last_written or (cache_last_written - datetime.datetime.now()).seconds > books_stale_after_secs
 
 
 def write_title_and_sentence(book_list):
     written = False
     while not written:
         book = book_list[random.randint(0, len(book_list)-1)]
-        sentence_list = requests.get(
-            book['formats'][book_format]
-        ).text.split('.')
-        print(book['title'],
-              sentence_list[random.randint(0, len(sentence_list)-1)]+'.')
-        written = True
+        try:
+            sentence_list = requests.get(
+                book['formats'][book_format]
+            ).text.split('.')
+            print(book['title'],
+                  sentence_list[random.randint(0, len(sentence_list)-1)]+'.')
+            written = True
+        except ValueError:
+            written = False
 
 
 if __name__ == '__main__':
