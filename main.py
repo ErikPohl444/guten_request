@@ -7,17 +7,15 @@ import json
 
 
 def get_all_books(start_url, cache_file_name, max_count):
-    url = start_url
-    current_list = requests.get(url)
     all_books = []
-    count = max_count  # keep this from running forever or attracting too much scrutiny
-    while current_list.ok and count > 0:
-        all_books.extend(current_list.json()["results"])
-        url = current_list.json()["next"]
-        current_list = requests.get(url)
-        count -= 1
+    current_list = requests.get(start_url)
+    while current_list.ok:
+        for _ in range(max_count, 0, -1):
+            all_books.extend(current_list.json()["results"])
+            url = current_list.json()["next"]
+            current_list = requests.get(url)
     with open(cache_file_name, "wb") as file_handle:
-        pickle.dump(book_list, file_handle)
+      pickle.dump(book_list, file_handle)
     return all_books
 
 
