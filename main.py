@@ -23,13 +23,12 @@ def get_all_books(start_url, cache_file_name, max_count):
 
 def is_stale_cache(cache_file_name):
     try:
-        cache_last_written = datetime.datetime.fromtimestamp(os.path.getmtime(cache_file_name))
+        return (
+                datetime.datetime.fromtimestamp(os.path.getmtime(cache_file_name)) -
+                datetime.datetime.now()
+        ).seconds > books_stale_after_secs
     except OSError:
-        cache_last_written = None
-    return (
-            not cache_last_written
-            or (cache_last_written - datetime.datetime.now()).seconds > books_stale_after_secs
-    )
+        return False
 
 
 def output_title_and_random_sentence(book_list):
@@ -40,8 +39,7 @@ def output_title_and_random_sentence(book_list):
             sentence_list = requests.get(
                 book['formats'][book_format]
             ).text.split('.')
-            print(book['title'],
-                  sentence_list[random.randint(0, len(sentence_list)-1)]+'.')
+            print(f'{book["title"]} {sentence_list[random.randint(0, len(sentence_list)-1)]}.')
             written = True
         except KeyError:
             written = False
@@ -59,8 +57,8 @@ if __name__ == '__main__':
     if is_stale_cache(cache_file_name):
         book_list = get_all_books(books_url, cache_file_name, books_list_max_page_count)
     else:
-        with open(cache_file_name, "rb") as fhandle:
-            book_list = pickle.load(fhandle)
+        with open(cache_file_name, "rb") as cache_handle:
+            book_list = pickle.load(cache_handle)
     if not book_list:
         raise OSError
 
