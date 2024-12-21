@@ -15,7 +15,7 @@ def get_all_books(start_url, cache_file_name, max_count):
             url = current_list.json()["next"]
             current_list = requests.get(url)
     with open(cache_file_name, "wb") as file_handle:
-      pickle.dump(book_list, file_handle)
+        pickle.dump(book_list, file_handle)
     return all_books
 
 
@@ -30,17 +30,16 @@ def is_stale_cache(cache_file_name):
 
 
 def output_title_and_random_sentence(book_list):
-    written = False
-    while not written:
+    sentence_list = None
+    while not sentence_list:
         book = book_list[random.randint(0, len(book_list)-1)]
         try:
             sentence_list = requests.get(
                 book['formats'][book_format]
             ).text.split('.')
-            print(f'{book["title"]} {sentence_list[random.randint(0, len(sentence_list)-1)]}.')
-            written = True
         except KeyError:
-            written = False
+            pass
+    print(f'{book["title"]} {sentence_list[random.randint(0, len(sentence_list)-1)]}.')
 
 
 if __name__ == '__main__':
